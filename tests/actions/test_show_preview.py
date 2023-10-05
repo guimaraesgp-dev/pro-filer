@@ -1,40 +1,71 @@
 from pro_filer.actions.main_actions import show_preview
 
 
-def test_show_preview():
-    test_cases = [
-        {
-            "name": "Test 1: consideram apenas all_files e all_dirs vazios",
-            "context": {"all_files": [], "all_dirs": []},
-        },
-        {
-            "name": "Test 2: Diretório com mais de 5 arquivos e diretórios",
-            "context": {
-                "all_files": [
-                    "file1.txt",
-                    "file2.txt",
-                    "file3.txt",
-                    "file4.txt",
-                    "file5.txt",
-                    "file6.txt",
-                ],
-                "all_dirs": ["dir1", "dir2", "dir3", "dir4", "dir5", "dir6"],
-            },
-        },
-        {
-            "name": "Test 3: Diretório com arquivos e diretórios",
-            "context": {
-                "all_files": ["file1.txt", "file2.txt", "file3.txt"],
-                "all_dirs": ["dir1", "dir2"],
-            },
-        },
-    ]
+def test_show_preview_1(capsys):
+    context = {"all_files": [], "all_dirs": []}
 
-    for test_case in test_cases:
-        print(test_case["name"])
-        show_preview(test_case["context"])
-        print()
+    show_preview(context=context)
+    captured = capsys.readouterr()
+
+    assert captured.out == "Found 0 files and 0 directories\n"
 
 
-if __name__ == "__main__":
-    test_show_preview()
+def test_show_preview_2(capsys):
+    context = {
+        "all_files": [
+            "src/__init__.py",
+            "src/app.py",
+            "src/utils/__init__.py",
+            "src/utils/file1.py",
+            "src/utils/file2.py",
+            "src/utils/file3.py",
+            "src/utils/file4.py",
+            "src/utils/file5.py",
+            "src/utils/file6.py",
+            "src/utils/file7.py",
+        ],
+        "all_dirs": [
+            "src",
+            "src/utils",
+            "src/utils/dir1",
+            "src/utils/dir2",
+            "src/utils/dir3",
+            "src/utils/dir4",
+            "src/utils/dir5",
+            "src/utils/dir6",
+            "src/utils/dir7",
+        ],
+    }
+
+    show_preview(context=context)
+    captured = capsys.readouterr()
+
+    assert captured.out == (
+        "Found 10 files and 9 directories\n"
+        "First 5 files: ['src/__init__.py', 'src/app.py', "
+        "'src/utils/__init__.py', 'src/utils/file1.py', "
+        "'src/utils/file2.py']\n"
+        "First 5 directories: ['src', 'src/utils', "
+        "'src/utils/dir1', 'src/utils/dir2', 'src/utils/dir3']\n"
+    )
+
+
+def test_show_preview_3(capsys):
+    context = {
+        "all_files": [
+            "src/__init__.py",
+            "src/app.py",
+            "src/utils/__init__.py",
+        ],
+        "all_dirs": ["src", "src/utils"],
+    }
+
+    show_preview(context=context)
+    captured = capsys.readouterr()
+
+    assert captured.out == (
+        "Found 3 files and 2 directories\n"
+        "First 5 files: ['src/__init__.py', 'src/app.py', "
+        "'src/utils/__init__.py']\n"
+        "First 5 directories: ['src', 'src/utils']\n"
+    )
